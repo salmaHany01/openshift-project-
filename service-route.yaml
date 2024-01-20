@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: sampledeployment
+  namespace: salmahany
+spec:
+  selector:
+    app: name
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  namespace: salmahany
+  name: 'sampleroute' 
+spec:
+  host: sample-app.salmahany.apps.ocpuat.devopsconsulting.org
+  to:
+    kind: Service
+    name: sampledeployment
+  port:  
+    targetPort: 8080
+  tls: 
+    termination: edge

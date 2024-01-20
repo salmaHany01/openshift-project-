@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: salmahany
+  name: 'sampledeployment'
+spec:
+  selector:
+    matchLabels:
+      app: name
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: name
+    spec:
+      volumes:
+        - name: persistentclaim
+          persistentVolumeClaim:
+            claimName: app-pvc
+      containers:
+        - name: container
+          image:  >-
+            image-registry.openshift-image-registry.svc:5000/openshift/httpd:latest
+          ports:
+            - containerPort: 8080
+              protocol: TCP
+          serviceAccountName: salmahany
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            runAsNonRoot: true
+            seccompProfile:
+              type: RuntimeDefault
+          volumeMounts:
+            - name: persistentclaim
+              mountPath: "/var/www/html/"
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+  paused: false
+
